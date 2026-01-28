@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -27,13 +28,24 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Timer? _timer;
 
-  void _startTimer() {
+  void _toggleTimer() {
     setState(() {
-      _counter++;
+      // Tried to check if timer is active and cancel if so,
+      // however, the timer is not resetting back to 0 when restarted
+      if (_timer != null && _timer!.isActive) {
+        _timer!.cancel();
+        _timer = null;
+      } else {
+        _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+          setState(() {
+            _counter++;
+          });
+        });
+      }
     });
   }
 
@@ -61,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _startTimer,
+        onPressed: _toggleTimer,
         tooltip: 'Start Timer',
         backgroundColor: const Color.fromARGB(255, 0, 140, 255), // Tried a bunch of blues (pre-defined + RGB), but don't seem to match the video
         foregroundColor: Colors.white,
